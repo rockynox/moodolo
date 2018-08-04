@@ -25,77 +25,80 @@ WiFiServer server(80);
 String status;
 
 void setup() {
-    //Serial.begin(9600);
-    delay(10);
+  Serial.begin(115200);
+  delay(10);
 
-    pinMode(ledPin, OUTPUT);
-    pinMode(pushButtonGreen, INPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(pushButtonGreen, INPUT);
 
-    digitalWrite(ledPin, LOW);
+  digitalWrite(ledPin, LOW);
 
-    // Connect to WiFi network
-    Serial.print("Connecting to ");
-    Serial.println(ouiFi);
-    WiFi.begin(ouiFi, motSecret);
+  // Connect to WiFi network
+  Serial.print("Connecting to ");
+  Serial.println(ouiFi);
+  WiFi.begin(ouiFi, motSecret);
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("WiFi connected");
+  while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(LED_BUILTIN, HIGH);
+    delay(300);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(300);
+    Serial.print(".");
 
-    // Start the server
-    server.begin();
-    Serial.println("Server started");
+  }
+  Serial.println("WiFi connected");
+  digitalWrite(LED_BUILTIN, HIGH);
 
-    // Print the IP address
-    Serial.print("Use this URL to connect: ");
-    Serial.print("http://");
-    Serial.print(WiFi.localIP());
-    Serial.println("/");
+  // Start the server
+  server.begin();
+  Serial.println("Server started");
 
-    delay(2000);
+  // Print the IP address
+  Serial.print("Use this URL to connect: ");
+  Serial.print("http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("/");
+
+  delay(2000);
 
 }
 
 void loop() {
 
-    
-    
-    digitalWrite(ledPin, ledState);
+  digitalWrite(ledPin, ledState);
 
-    int buttonState = digitalRead(pushButtonGreen);
-    Serial.println(buttonState);
+  int buttonState = digitalRead(pushButtonGreen);
+  //Serial.println(buttonState);
 
-    if(buttonState == 1){
-      ledState = !ledState;
-      HTTPClient http;
-      http.begin("http://172.20.10.3:1880/mood");
-      //http.addHeader("Content-Type", "application/json");
-      //http.POST("moodValue=10");
-      int httpCode = http.POST("12");
+  if (buttonState == 1) {
+    ledState = !ledState;
+    HTTPClient http;
+    http.begin("http://172.20.10.3:1880/mood");
+    //http.addHeader("Content-Type", "application/json");
+    //http.POST("moodValue=10");
+    int httpCode = http.POST("12");
 
-        // httpCode will be negative on error
-        if(httpCode > 0) {
-            // HTTP header has been send and Server response header has been handled
-            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+    // httpCode will be negative on error
+    if (httpCode > 0) {
+      // HTTP header has been send and Server response header has been handled
+      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 
-            // file found at server
-            if(httpCode == HTTP_CODE_OK) {
-                String payload = http.getString();
-                Serial.println(payload);
-            }
-        } else {
-            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-
-        http.end();
+      // file found at server
+      if (httpCode == HTTP_CODE_OK) {
+        String payload = http.getString();
+        Serial.println(payload);
+      }
+    } else {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
     }
 
-    
+    http.end();
+  }
+
+
 
 
 
 
 }
+
